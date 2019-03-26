@@ -11,4 +11,9 @@ class SoapBoxFormatter implements FormatterInterface
     {
         return SoapBox::make($array, SoapBox::ARR)->toCsv();
     }
+
+    public function xmlToArray(string $xml)
+    {
+        return SoapBox::make($xml, SoapBox::XML)->toArray();
+    }
 }
