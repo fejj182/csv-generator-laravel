@@ -7,20 +7,8 @@ use App\Contracts\FormatterInterface;
 
 class SoapBoxFormatter implements FormatterInterface
 {
-    public function arrayToCsv(array $clients)
+    public function arrayToCsv(array $array)
     {
-        $clients = $this->capitalizeKeysForHeader($clients);
-        $formatter = SoapBox::make($clients, SoapBox::ARR);
-        return $formatter->toCsv();
-    }
-
-    private function capitalizeKeysForHeader(array $clients) {
-        return array_map(function($client) {
-            foreach($client as $key => $value) {
-                $client[ucfirst($key)] = $value;
-                unset($client[$key]);
-            };
-            return $client;
-        }, $clients);
+        return SoapBox::make($array, SoapBox::ARR)->toCsv();
     }
 }

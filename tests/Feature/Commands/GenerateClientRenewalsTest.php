@@ -8,7 +8,7 @@ use Facades\App\Services\ClientRenewals;
 use Box\Spout\Reader\ReaderFactory;
 use Box\Spout\Common\Type;
 
-class GenerateCsvFromClientsTest extends TestCase
+class GenerateClientRenewalsTest extends TestCase
 {
     use WithFaker;
 
@@ -23,18 +23,18 @@ class GenerateCsvFromClientsTest extends TestCase
             [
                 'name' => $this->faker->name,
                 'email' => $this->faker->email,
-                'telephone' => $this->faker->phoneNumber,
-                'business' => $this->faker->company
+                'phone' => $this->faker->phoneNumber,
+                'company' => $this->faker->company
             ],
             [
                 'name' => $this->faker->name,
                 'email' => $this->faker->email,
-                'telephone' => $this->faker->phoneNumber,
-                'business' => $this->faker->company
+                'phone' => $this->faker->phoneNumber,
+                'company' => $this->faker->company
             ]
         ];
 
-        ClientRenewals::shouldReceive('get')
+        ClientRenewals::shouldReceive('getClients')
                     ->once()
                     ->andReturn($clients);
 
@@ -54,10 +54,10 @@ class GenerateCsvFromClientsTest extends TestCase
                 switch($key) {
                     case 1:
                         $this->assertEquals([
-                            0 => "Name",
+                            0 => "Nombre",
                             1 => "Email",
-                            2 => "Telephone",
-                            3 => "Business"
+                            2 => "Teléfono",
+                            3 => "Empresa"
                         ], $row);
                         break;
                     case 2:
