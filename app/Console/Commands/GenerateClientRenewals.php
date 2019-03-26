@@ -4,7 +4,6 @@ namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
 use Facades\App\Services\ClientRenewals;
-use App\Contracts\FormatterInterface;
 
 class GenerateClientRenewals extends Command
 {
@@ -14,6 +13,7 @@ class GenerateClientRenewals extends Command
      * @var string
      */
     protected $signature = 'clientRenewals:generate
+    { --input=json : Format of input }
     { --filename=clientRenewals : Desired name of file }';
 
     /**
@@ -24,42 +24,31 @@ class GenerateClientRenewals extends Command
     protected $description = 'Generate a CSV with clients due for renewal';
 
     /**
-     * Create a new command instance.
-     *
-     * @return void
-     */
-    public function __construct(FormatterInterface $formatter)
-    {
-        parent::__construct();
-
-        $this->formatter = $formatter;
-    }
-
-    /**
      * Execute the console command.
      *
      * @return mixed
      */
     public function handle()
     {
-        $clients = ClientRenewals::getClients();
-        $this->mapHeaders($clients);
+        $input = $this->option('input');
+        $clients = [];
 
-        $csv = $this->formatter->arrayToCsv($clients);
+        switch($input) {
+            case 'json':
+                $clients = ClientRenewals::getClientsFromJson();
+                break;
+            case 'xml':
+                $path = 'example_client_renewals';
+                $clients = ClientRenewals::getClientsFromXml($path);
+                break;
+        }
 
-        $file = fopen($this->option('filename') . date('dmY') . '.csv','w');
-        fputs($file, $csv);
-        fclose($file);
-    }
+        if (count($clients) > 0) {
+            $csv = ClientRenewals::getCsvFromClients($clients);
+            $file = fopen($this->option('filename') . date('dmY') . '.csv','w');
+            fputs($file, $csv);
+            fclose($file);
+        }
 
-    private function mapHeaders(array &$clients) {
-        $clients = array_map(function($client) {
-            return [
-                'Nombre' => $client['name'],
-                'Email' => $client['email'],
-                'Teléfono' => $client['phone'],
-                'Empresa' => $client['company']
-            ];
-        }, $clients);
     }
 }

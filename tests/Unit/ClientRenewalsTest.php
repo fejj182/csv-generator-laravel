@@ -10,23 +10,10 @@ class ClientRenewalsTest extends TestCase
 {
     use MockHttpRequests;
 
-    /**
-     * @test
-     *
-     * @return void
-     */
-    public function preparesClientRenewalsDataWithCorrectContract()
+    protected function setUp(): void
     {
-        $this->mock_client();
-        $this->append_response(
-            200,
-            ['Content-Type' => 'application/json'],
-            load_stub('client_renewals')
-        );
-
-        $clients = ClientRenewals::getClients();
-
-        $expectedClients = [
+        parent::setUp();
+        $this->expectedClients = [
             [
                 "name" => "Leanne Graham",
                 "email" => "Sincere@april.biz",
@@ -40,7 +27,37 @@ class ClientRenewalsTest extends TestCase
                 "company" => "Deckow-Crist"
             ]
         ];
+    }
 
-        $this->assertEquals($expectedClients, $clients);
+    /**
+     * @test
+     *
+     * @return void
+     */
+    public function preparesClientRenewalsFromJson()
+    {
+        $this->mock_client();
+        $this->append_response(
+            200,
+            ['Content-Type' => 'application/json'],
+            load_stub('client_renewals.json')
+        );
+
+        $clients = ClientRenewals::getClientsFromJson();
+
+        $this->assertEquals($this->expectedClients, $clients);
+    }
+
+    /**
+     * @test
+     *
+     * @return void
+     */
+    public function preparesClientRenewalsFromXml()
+    {
+        $path = 'tests/stubs/client_renewals';
+        $clients = ClientRenewals::getClientsFromXml($path);
+
+        $this->assertEquals($this->expectedClients, $clients);
     }
 }
