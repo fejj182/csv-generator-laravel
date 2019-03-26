@@ -42,11 +42,24 @@ class GenerateClientRenewals extends Command
      */
     public function handle()
     {
-        $clients = ClientRenewals::get();
+        $clients = ClientRenewals::getClients();
+        $this->mapHeaders($clients);
+
         $csv = $this->formatter->arrayToCsv($clients);
 
         $file = fopen($this->option('filename') . date('dmY') . '.csv','w');
         fputs($file, $csv);
         fclose($file);
+    }
+
+    private function mapHeaders(array &$clients) {
+        $clients = array_map(function($client) {
+            return [
+                'Nombre' => $client['name'],
+                'Email' => $client['email'],
+                'Teléfono' => $client['phone'],
+                'Empresa' => $client['company']
+            ];
+        }, $clients);
     }
 }
